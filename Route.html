@@ -1,0 +1,174 @@
+<html>
+    <head>
+        <title>Leaflet Routing Machine Lab</title>
+
+
+      		<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+      		<link rel="stylesheet" href="./dist/leaflet-routing-machine.css" />
+      		<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+      		<script src="./dist/leaflet-routing-machine.js"></script>
+      		<link rel="stylesheet" href="./dist/Control.Geocoder.css" />
+      		<script src="./dist/Control.Geocoder.js"></script>
+
+    <!-- Insert your code here ---->
+		<style>
+    		.map {
+    		position: absolute;
+    		width: 100%;
+    		height: 100%;
+		}
+    </style>
+
+
+  </head>
+    <!-- Insert your code here ---->
+<body>
+	   <div id="map" class="map"></div>
+
+
+<script>
+
+	   var map = L.map('map').setView([13.751908, 100.539029], 13);
+        	//initialize tile layer and add it to map
+        	L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        	attribution: '© OpenStreetMap contributors'
+        	}).addTo(map);
+
+	   var control = L.Routing.control({
+        	createMarker: function(i,wp){
+        	return L.marker(wp.latLng,{
+        	draggable: true,
+        	icon: L.icon({
+        		iconUrl: './image/marker.png',
+        		iconSize:[30,30],
+        		iconAnchor:[15,15],
+        		})
+        	});
+          },
+
+          	waypoints: [
+          	L.latLng(14.068860, 100.607822), //starting point
+          	L.latLng(13.980708, 100.554199) //end point
+          	],
+	          //serviceUrl: ' http://203.131.209.91:5000/route/v1',
+
+          	routeWhileDragging: true,
+          	reverseWaypoints: true,
+          	useZoomParameter: true,
+          	geocoder: L.Control.Geocoder.nominatim(),
+          	showAlternatives: true,
+          	altLineOptions:{
+          	styles: [{color: 'blue', opacity: 0.15, weight: 9}]
+          	}
+
+        }).addTo(map);
+
+	    var myIcon = L.icon({
+          iconUrl: '1.png',
+          iconSize: [44,44],
+        });
+
+	    var icon1=L.marker([14.057183, 100.514690], {icon: myIcon}).addTo(map);
+
+    	var myIcon2 = L.icon({
+        iconUrl: '2.png',
+        iconSize: [42,42],
+
+	      });
+
+	    var icon2=L.marker([13.957183, 100.50], {icon: myIcon2}).addTo(map);
+
+    	var myIcon3 = L.icon({
+        iconUrl: '3.png',
+        iconSize: [50,50],
+
+	      });
+        
+	    var icon3=L.marker([13.967183, 100.60], {icon: myIcon3}).addTo(map);
+	     //icon3.bindPopup("I'm me");
+
+
+
+
+    	control.on('routesfound', function(e){
+    	var distance = e.routes[0].summary.totalDistance;
+    	var time = e.routes[0].summary.totalTime;
+    	alert("Distance from your location:  "+(distance/1000).toFixed(1) + " km  and Approx Time is "+(time/60).toFixed(1)+" mins");
+    	//var result_summary = "distance: "+distance:+" Time: "+time;
+    	});
+
+
+   //Insert your code here
+      </script>
+      addCustomIcon();
+      <script>
+
+
+    	function createButton(label, container) {
+    	   var btn = L.DomUtil.create('button', '', container);
+    	       btn.setAttribute('type', 'button');
+    	       btn.innerHTML = label;
+    	       return btn;
+    	}
+    	   icon3.on('click', function(e) {
+
+    	   var container = L.DomUtil.create('div'),
+            	//startBtn = createButton('Start from Tom\'s house', container),
+            	destBtn = createButton('June\'s house', container);
+            	L.popup()
+            	.setContent(container)
+            	.setLatLng(e.latlng)
+            	.openOn(map);
+
+            	L.DomEvent.on(destBtn, 'click', function() {
+            	control.spliceWaypoints(1, 1, e.latlng);
+            	map.closePopup();
+            	});
+            });
+
+        	icon2.on('click', function(e) {
+        	var container = L.DomUtil.create('div'),
+        	//startBtn = createButton('Start from Tom\'s house', container),
+        	destBtn = createButton('Parista\'s house', container);
+            	L.popup()
+            	.setContent(container)
+            	.setLatLng(e.latlng)
+            	.openOn(map);
+
+	            L.DomEvent.on(destBtn, 'click', function() {
+	            control.spliceWaypoints(1, 1, e.latlng);
+	            map.closePopup();
+	           });
+	        });
+
+	        icon1.on('click', function(e) {
+
+          var container = L.DomUtil.create('div'),
+        	//startBtn = createButton('Start from Tom\'s house', container),
+        	destBtn = createButton('Oily\'s house', container);
+            	L.popup()
+            	.setContent(container)
+            	.setLatLng(e.latlng)
+            	.openOn(map);
+
+            	L.DomEvent.on(destBtn, 'click', function() {
+            	control.spliceWaypoints(1, 1, e.latlng);
+            	map.closePopup();
+            	});
+          });
+
+    //get current location
+    navigator.geolocation.getCurrentPosition(displayLocation);
+
+    function displayLocation(position) {
+              console.log('position', position);
+              var lat = position.coords.latitude;
+              var lng = position.coords.longitude;
+          	  control.spliceWaypoints(0, 1, [lat,lng]);
+              map.setView([lat, lng], 16);
+
+
+}
+</script>
+</body>
+</html>

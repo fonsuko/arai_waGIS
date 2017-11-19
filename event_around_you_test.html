@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<title>Go Vent Gone</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+
+<!-- leaflet -->
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css"/>
+<link rel="stylesheet" href="./dist/leaflet-routing-machine.css" />
+<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+<script src="./dist/leaflet-routing-machine.js"></script>
+
+<link rel="stylesheet" href="./dist/Control.Geocoder.css" />
+<script src="./dist/Control.Geocoder.js"></script>
+
+<!-- User position------------------------------------------------------------>
+<script src="./dist/jquery-3.2.1.min.js"></script>
+
+<!-- Style-------------------------------------------------------------------->
+<head>
+      <style>
+
+      p{
+        font-family: "Montserrat";
+        font-weight:bold;
+        font-size: 16px;
+      }
+
+      pop{
+        font-family: "Montserrat";
+        font-size: 12px;
+      }
+
+      .column{
+          float: left;
+          width: 75%;
+          padding: 15px;
+      }
+
+      /* Content */
+      h1{
+          font-family: "Roboto";
+          font-weight:bold;
+          font-size: 24px;
+      }
+      .column {
+          float: left;
+          width: 100%;
+          padding-left: 15px;
+      }
+
+      .subcolumn {
+          float: left;
+          width: 35%;
+          padding-left: 15px;
+      }
+
+      .map {
+   		    position: absolute;
+   		    width:78%;
+   		    height: 75%;
+      }
+      .icon{
+          height: 100%;
+          width: 100%;
+      }
+
+      </style>
+</head>
+
+<body>
+
+<!-- Left menu---------------------------------------------------------------->
+<div class="w3-sidebar w3-bar-block w3-light-grey w3-card" style="width:20%;">
+  <a href="main.html"><img src="picture/gvg_logo.png" style="padding-left:15px;padding-top:15px;height:50px;"></a>
+  <br></br>
+  <button class="w3-button w3-block w3-left-align" onclick="myAccFunc()">Explore Event <i class="fa fa-caret-down"></i></button>
+    <div id="demoAcc" class="w3-hide w3-white w3-card">
+      <a href="#" class="w3-bar-item w3-button">&nbsp;&nbsp;&nbsp;&nbsp;Art</a>
+      <a href="#" class="w3-bar-item w3-button">&nbsp;&nbsp;&nbsp;&nbsp;Business</a>
+      <a href="#" class="w3-bar-item w3-button">&nbsp;&nbsp;&nbsp;&nbsp;Community</a>
+      <a href="#" class="w3-bar-item w3-button">&nbsp;&nbsp;&nbsp;&nbsp;Education</a>
+      <a href="#" class="w3-bar-item w3-button">&nbsp;&nbsp;&nbsp;&nbsp;Fashion</a>
+      <a href="#" class="w3-bar-item w3-button">&nbsp;&nbsp;&nbsp;&nbsp;Film &amp; Medias</a>
+      <a href="#" class="w3-bar-item w3-button">&nbsp;&nbsp;&nbsp;&nbsp;Food &amp; Drink</a>
+      <a href="#" class="w3-bar-item w3-button">&nbsp;&nbsp;&nbsp;&nbsp;Health</a>
+      <a href="#" class="w3-bar-item w3-button">&nbsp;&nbsp;&nbsp;&nbsp;Music</a>
+      <a href="#" class="w3-bar-item w3-button">&nbsp;&nbsp;&nbsp;&nbsp;Science &amp; Technology</a>
+      <a href="#" class="w3-bar-item w3-button">&nbsp;&nbsp;&nbsp;&nbsp;Sport &amp; Fitness</a>
+    </div>
+  <a href="event_around_you.html" class="w3-bar-item w3-button">Event around you</a>
+  <a href="#" class="w3-bar-item w3-button">Free ticket event</a>
+  <a href="#" class="w3-bar-item w3-button">Selected event</a>
+  <a href="#" class="w3-bar-item w3-button">History</a>
+</div>
+<!-- Right Content------------------------------------------------------------>
+<div style="margin-left:20%;">
+  <!-- Topic ----------------------------------------------------------------->
+  <div class="column">
+    <h1>
+      Please select
+      <div class="w3-dropdown-click">
+        <button onclick="selectionDropdown()" class="w3-button w3-black">Distance <i class="fa fa-caret-down"></i></button>
+        <div id="Demo" class="w3-dropdown-content w3-bar-block w3-border">
+          <a href="#" class="w3-bar-item w3-button">1 km</a>
+          <a href="#" class="w3-bar-item w3-button">10 km</a>
+          <a href="#" class="w3-bar-item w3-button">30 km</a>
+          <a href="#" class="w3-bar-item w3-button">100 km</a>
+        </div>
+      </div>
+      and
+      <div class="w3-dropdown-click">
+        <button onclick="selectionDropdown()" class="w3-button w3-black">Time <i class="fa fa-caret-down"></i></button>
+        <div id="Demo" class="w3-dropdown-content w3-bar-block w3-border">
+          <a href="#" class="w3-bar-item w3-button">15 min</a>
+          <a href="#" class="w3-bar-item w3-button">30 min</a>
+          <a href="#" class="w3-bar-item w3-button">1 hr</a>
+          <a href="#" class="w3-bar-item w3-button">1 day</a>
+        </div>
+      </div>
+      << Bug
+
+    </h1>
+    <hr width="98%">
+    <div id="map"class="map"> </div>
+    <!--<p id="timeFunc">time</p> Bug not display-->
+</div>
+<script>
+    var map = L.map('map').setView([13.751908, 100.539029], 13);
+
+    //initialize tile layer and add it to map
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    map.locate({setView: true, maxZoom: 16});
+    var lon_origin;
+    var lat_origin;
+    var lat_des;
+    var lon_des;
+
+    function onLocationFound(e) {
+        lat_origin = e.latlng.lat;
+        lon_origin = e.latlng.lng;
+        L.marker(e.latlng).addTo(map)
+            .bindPopup("You current location is here!!!!").openPopup();
+    }
+    map.on('locationfound', onLocationFound);
+
+    function onLocationError(e) {
+        alert(e.message);
+    }
+
+    map.on('locationerror', onLocationError);
+
+
+    var control = "";
+    function markerOnClick(e){
+
+      if(control != ""){
+             lat_des = e.latlng.lat;
+             lon_des = e.latlng.lng;
+    		updateroute(lat_des,lon_des);
+
+    	}else{
+
+      lat_des = e.latlng.lat;
+    	lon_des = e.latlng.lng;
+
+      control = L.Routing.control({
+      createMarker: function(i, wp) {
+    			    return L.marker(wp.latLng, {
+    					draggable: true,
+    					icon: L.icon({
+                            iconSize:     [30, 30],
+                            iconAnchor:   [15, 15],
+                            iconUrl: './image/marker.png'
+                        })
+    				});
+    			},
+        waypoints: [
+            L.latLng(lat_origin, lon_origin), //starting point
+            L.latLng(lat_des, lon_des) //end point
+        ],
+        //serviceUrl: 'http://203.131.209.91:5000/route/v1',
+        routeWhileDragging: true,
+        reverseWaypoints: true,
+        geocoder: L.Control.Geocoder.nominatim(),
+        showAlternatives: true,
+        altLineOptions: {
+    			styles: [
+    				{color: 'black', opacity: 0.8, weight: 5},
+    				{color: 'green', opacity: 0.8, weight: 5},
+    				{color: 'blue', opacity: 0.8, weight: 5}
+    			]
+    		}// for customize the alternative routing color
+
+    }).addTo(map)
+      //map.addLayer(control);
+    control.on('routesfound', function (e){
+           var distance = e.routes[0].summary.totalDistance;
+            var time = e.routes[0].summary.totalTime;
+            distance = Math.round(distance/1000);
+            time = Math.round(time/60);
+            var result_summary = "You need to travel " + distance + " Km. and travel time is " + time + " Mins. to your destination";
+            //console.log(result_summary);
+            alert(result_summary);
+    });
+        }
+     }
+
+    function updateroute(lat_des,lon_des){
+        //map.removeControl(control);
+        //map.addControl(control);
+    	//control.spliceWaypoints(0, 2);
+        control.getPlan().setWaypoints([
+                L.latLng(lat_origin, lon_origin),
+                L.latLng(lat_des, lon_des)
+        ]);
+
+    }
+    //in the case want to export route to geojson
+    control.on('routeselected', function(e) {
+      var coord = e.route.coordinates;
+      var instr = e.route.instructions;
+      var gg = L.geoJson(getInstrGeoJson(instr,coord));
+    console.log(gg);
+    });
+
+    function getInstrGeoJson(instr,coord) {
+      var formatter = new L.Routing.Formatter();
+      var instrPts = {
+        type: "FeatureCollection",
+        features: []
+      };
+      for (var i = 0; i < instr.length; ++i) {
+        var g = {
+          "type": "line",
+          "coordinates": [coord[instr[i].index].lng, coord[instr[i].index].lat]
+        };
+        var p = {
+          "instruction": formatter.formatInstruction(instr[i])
+        };
+        instrPts.features.push({
+          "geometry": g,
+          "type": "Feature",
+          "properties": p
+        });
+      }
+      return instrPts
+
+    }
+
+
+
+
+
+// Create button//
+function createButton(label, container) {
+		var btn = L.DomUtil.create('button', '', container);
+		btn.setAttribute('type', 'button');
+		btn.innerHTML = label;
+		return btn;
+}
+//Clock//
+// Set the date we're counting down to
+var countDownDate = new Date("Nov 14, 2017 9:37:00").getTime();
+
+// Update the count down every 1 second
+var count = setInterval(function() {
+
+// Get todays date and time
+var now = new Date().getTime();
+
+// Find the distance between now an the count down date
+var distance = countDownDate - now;
+
+// Time calculations for days, hours, minutes and seconds
+var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+// Output the result in an element with id="timeFunc"
+document.getElementById("timeFunc").innerHTML = days + "d " + hours + "h "+ minutes + "m " + seconds + "s ";
+
+// If the count down is over, write some text
+  if (distance < 0) {
+      clearInterval(count);
+      document.getElementById("timeFunc").innerHTML = "EXPIRED";
+      removeMarker();
+  }
+}, 1000);
+
+//Accordion menu//
+function myAccFunc(){
+    var x = document.getElementById("demoAcc");
+    if (x.className.indexOf("w3-show") == -1) {
+        x.className += " w3-show";
+        x.previousElementSibling.className += " w3-show";
+    } else {
+        x.className = x.className.replace(" w3-show", "");
+        x.previousElementSibling.className =
+        x.previousElementSibling.className.replace(" w3-show", "");
+    }
+}
+
+//Dropdown button//
+function selectionDropdown() {
+    var x = document.getElementById("Demo");
+    if (x.className.indexOf("w3-show") == -1) {
+        x.className += " w3-show";
+    } else {
+        x.className = x.className.replace(" w3-show", "");
+    }
+}
+
+</script>
+
+</body>
+</html>
